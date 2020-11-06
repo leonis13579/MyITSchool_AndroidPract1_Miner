@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.GridLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,14 +60,124 @@ public class MainActivity extends AppCompatActivity {
                 game_on = false;
                 switch_off();
             } else {
-                v.setBackgroundResource(R.color.Gray);
+                colorToGray(v);
             }
         }
     };
 
+    private void colorToGray(View v) {
+        Drawable background = v.getBackground();
+        if (((ColorDrawable) background).getColor() == getColor(R.color.white)) {
+            v.setBackgroundResource(R.color.Gray);
+            if (scanBombs(v) != 0) {
+                RelativeLayout rl = (RelativeLayout) v;
+                TextView tv = (TextView) rl.getChildAt(0);
+                tv.setVisibility(View.VISIBLE);
+                tv.setText(Integer.toString(scanBombs(v)));
+            } else {
+                int x = getX(v);
+                int y = getY(v);
+
+                if (y > 0) {
+                    if (!bombs[y - 1][x]) {
+                        colorToGray(cells[y - 1][x]);
+                    }
+                }
+                if (x > 0) {
+                    if (!bombs[y][x - 1]) {
+                        colorToGray(cells[y][x - 1]);
+                    }
+                }
+                if (y < height - 1) {
+                    if (!bombs[y + 1][x]) {
+                        colorToGray(cells[y + 1][x]);
+                    }
+                }
+                if (x < width - 1) {
+                    if (!bombs[y][x + 1]) {
+                        colorToGray(cells[y][x + 1]);
+                    }
+                }
+                if (y < height - 1 && x > 0) {
+                    if (!bombs[y + 1][x - 1]) {
+                        colorToGray(cells[y + 1][x - 1]);
+                    }
+                }
+                if (y > 0 && x < width - 1) {
+                    if (!bombs[y - 1][x + 1]) {
+                        colorToGray(cells[y - 1][x + 1]);
+                    }
+                }
+                if (y > 0 && x > 0) {
+                    if (!bombs[y - 1][x - 1]) {
+                        colorToGray(cells[y - 1][x - 1]);
+                    }
+                }
+                if (y < height - 1 && x < width - 1) {
+                    if (!bombs[y + 1][x + 1]) {
+                        colorToGray(cells[y + 1][x + 1]);
+                    }
+                }
+            }
+        }
+    }
+
+    private int scanBombs(View v) {
+        int x = getX(v);
+        int y = getY(v);
+        int count = 0;
+
+        if (y > 0) {
+            if (bombs[y - 1][x]) {
+                count++;
+            }
+        }
+        if (x > 0) {
+            if (bombs[y][x - 1]) {
+                count++;
+            }
+        }
+        if (y < height - 1) {
+            if (bombs[y + 1][x]) {
+                count++;
+            }
+        }
+        if (x < width - 1) {
+            if (bombs[y][x + 1]) {
+                count++;
+            }
+        }
+        if (y < height - 1 && x > 0) {
+            if (bombs[y + 1][x - 1]) {
+                count++;
+            }
+        }
+        if (y > 0 && x < width - 1) {
+            if (bombs[y - 1][x + 1]) {
+                count++;
+            }
+        }
+        if (y > 0 && x > 0) {
+            if (bombs[y - 1][x - 1]) {
+                count++;
+            }
+        }
+        if (y < height - 1 && x < width - 1) {
+            if (bombs[y + 1][x + 1]) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+
     private void switch_off() {
         for (int i = 0; i < cellsLayout.getChildCount(); i++) {
             RelativeLayout rl = (RelativeLayout) cellsLayout.getChildAt(i);
+            if (bombs[getY(rl)][getX(rl)]) {
+                rl.setBackgroundResource(R.color.Red);
+            }
             rl.setOnLongClickListener(null);
             rl.setOnClickListener(null);
         }
