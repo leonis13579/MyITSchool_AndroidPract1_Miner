@@ -1,0 +1,1 @@
+MyITSchool_AndroidPract1_Miner
